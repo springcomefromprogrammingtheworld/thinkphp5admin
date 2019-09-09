@@ -31,7 +31,7 @@ class Base extends Controller
     //检测后台登陆状态
     public function check_login(){
         if(empty(Cookie::get('uid'))){
-            $this->success("请登录急客救援后台管理系统再进行操作!", 'login/login');
+            $this->success("请登录后台管理系统再进行操作!", 'login/login');
         }
     }
 
