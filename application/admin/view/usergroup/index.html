@@ -1,0 +1,186 @@
+{include file="public/header" /}
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+<!--[if lt IE 9]>
+<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+{include file="public/navtitle" /}
+<div class="x-body">
+    <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+            <input class="layui-input" placeholder="开始日" name="start" id="start">
+            <input class="layui-input" placeholder="截止日" name="end" id="end">
+            <input type="text" name="name" placeholder="请输入角色名称" autocomplete="off" class="layui-input">
+            <button class="layui-btn" lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+        </form>
+    </div>
+    <xblock>
+        <button class="layui-btn layui-btn-danger" onclick="delAll()">
+            <i class="layui-icon"></i>批量删除
+        </button>
+        <button class="layui-btn" onclick="x_admin_show('添加角色','{:url("usergroup/edit")}')">
+            <i class="layui-icon"></i>添加
+        </button>
+        <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
+    </xblock>
+    <table class="layui-table">
+        <thead>
+        <tr>
+            <th>
+                <div class="layui-unselect header layui-form-checkbox" lay-skin="primary">
+                    <i class="layui-icon">&#xe605;</i>
+                </div>
+            </th>
+            <th>ID</th>
+            <th>角色名</th>
+            <th>描述</th>
+            <th>状态</th>
+            <th>操作</th>
+        </thead>
+        <tbody>
+        {volist name='list' id='usergroup'}
+            <tr>
+                <td>
+                    <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='2'>
+                        <i class="layui-icon">&#xe605;</i>
+                    </div>
+                </td>
+                <td>{$usergroup.roleid}</td>
+                <td>{$usergroup.name}</td>
+                <td>{$usergroup.remarks}</td>
+                <td class="td-status">
+                    {if $usergroup.status == 1}
+                        <span class="layui-btn layui-btn-normal layui-btn-mini">已启用</span>
+                    {else /}
+                        <span class="layui-btn layui-btn-normal layui-btn-mini layui-btn-disabled">已停用</span>
+                    {/if}
+                </td>
+                <td class="td-manage">
+                    {if $usergroup.status == 1}
+                    <a onclick="member_stop(this,{$usergroup.roleid})" href="javascript:;" title="启用">
+                        <i class="layui-icon">&#xe601;</i>
+                    </a>
+                    {else /}
+                    <a onclick="member_stop(this,{$usergroup.roleid})" href="javascript:;" title="禁用">
+                        <i class="layui-icon">&#xe62f;</i>
+                    </a>
+                    {/if}
+                    <a title="编辑" onclick="x_admin_show('编辑','{:url("usergroup/edit",array('id'=>$usergroup.roleid))}')" href="javascript:;">
+                        <i class="layui-icon">&#xe642;</i>
+                    </a>
+                    <a title="删除" onclick="member_del(this,{$usergroup.roleid})" href="javascript:;">
+                        <i class="layui-icon">&#xe640;</i>
+                    </a>
+                </td>
+            </tr>
+        {/volist}
+        </tbody>
+    </table>
+    <div class="page">
+        {$page}
+    </div>
+
+</div>
+<script>
+    layui.use('laydate', function () {
+        var laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#start' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#end' //指定元素
+        });
+    });
+
+    /*用户组-停用*/
+    function member_stop(obj,id) {
+        var type,title;
+        if ($(obj).attr('title') == '启用') {
+            type = 0;
+            title = '确认要停用吗？';
+        }else{
+            type = 1;
+            title = '确认要启用吗？';
+        }
+        layer.confirm(title, function (index) {
+            $.ajax({
+                type: "post",
+                url: "{:url('usergroup/off')}",
+                data: {
+                    type: type,
+                    id: id
+                },
+                success: function (rs) {
+                    if (rs.status == 1) {
+                        if ($(obj).attr('title') == '启用') {
+                            //发异步把用户状态进行更改
+                            $(obj).attr('title', '停用')
+                            $(obj).find('i').html('&#xe62f;');
+                            $(obj).parents("tr").find(".td-status").find('span').addClass('layui-btn-disabled').html('已停用');
+                            layer.msg('已停用!', {icon: 5, time: 1000});
+                        } else {
+                            $(obj).attr('title', '启用')
+                            $(obj).find('i').html('&#xe601;');
+                            $(obj).parents("tr").find(".td-status").find('span').removeClass('layui-btn-disabled').html('已启用');
+                            layer.msg('已启用!', {icon: 6, time: 1000});
+                        }
+                    }else{
+                        layer.msg(rs.msg, {icon: 5, time: 1000});
+                    }
+                }
+            });
+        });
+    }
+
+    /*用户组-删除*/
+    function member_del(obj, id) {
+        layer.confirm('确认要删除吗？', function (index) {
+            //发异步删除数据
+            $.ajax({
+                type:"post",
+                url:"{:url('usergroup/del')}",
+                data:{
+                    id:id
+                },
+                success:function(rs){
+                    if(rs.status == 1){
+                        $(obj).parents("tr").remove();
+                        layer.msg(rs.msg, {icon: 1, time: 1000});
+                    }else{
+                        layer.msg(rs.msg, {icon: 1, time: 1000});
+                    }
+                }
+            })
+        });
+    }
+
+
+    function delAll(argument) {
+        var data = tableCheck.getData();
+        layer.confirm('确认要删除吗？' + data, function (index) {
+            //捉到所有被选中的，发异步进行删除
+            $.ajax({
+                type:"post",
+                url:"{:url('usergroup/del')}",
+                data:{
+                    id:data
+                },
+                success:function(rs){
+                    if(rs.status == 1){
+                        layer.msg(rs.msg, {icon: 1});
+                        $(".layui-form-checked").not('.header').parents('tr').remove();
+                    }else{
+                        layer.msg(rs.msg, {icon: 1});
+                    }
+                }
+            });
+        });
+    }
+</script>
+</body>
+
+</html>

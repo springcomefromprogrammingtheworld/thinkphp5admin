@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        input{width:70%;text-align: left;line-height: 40px;outline: medium;}
+    </style>
+</head>
+<!--开发人员工具，查询数据库数据-->
+<body>
+<form method="post" action="">
+    <p>select</p>
+    <input type="text" name="field" placeholder="字段" >
+    <p>from</p>
+    <input type="text" name="table" placeholder="表名">
+    <p>where</p>
+    <input type="text" name="where" placeholder="条件">
+    <p></p>
+    <input type="submit" name="sub">
+</form>
+<hr>
+<form method="post" action="">
+    <p>获取URL返回内容例如:https://www.kancloud.cn/manual/thinkphp5/139061</p>
+    <input type="text" name="url" placeholder="链接">
+    <input type="submit" value="查询">
+</form>
+<form method="post" action="">
+    <p>show columns from (显示数据表字段) 输入表名例如:gw_menu</p>
+    <input type="text" name="datasheet" placeholder="数据表">
+    <input type="submit" value="查询">
+</form>
+</body>
+</html>

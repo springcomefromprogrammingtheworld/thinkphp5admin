@@ -1,0 +1,52 @@
+    <div class="container">
+        <div class="logo"><a href="{:url('index/index')}">通用后台管理基本系统</a></div>
+        <div class="left_open">
+            <i title="展开左侧栏" class="iconfont">&#xe699;</i>
+        </div>
+        <ul class="layui-nav right" lay-filter="">
+            <li class="layui-nav-item">
+                <a href="javascript:;">{$uname}</a>
+                <dl class="layui-nav-child"> <!-- 二级菜单 -->
+                    <dd><a href="{:url('login/logout')}">注销登录</a></dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+    <div class="left-nav">
+        <div id="side-nav">
+            <ul id="nav">
+                {volist name="menu" id="vo"}
+                <li>
+                    <a href="javascript:;">
+                        <i class="iconfont">&#xe6b8;</i>
+                        <cite>{$vo.menu_name}</cite>
+                        <i class="iconfont nav_right">&#xe697;</i>
+                    </a>
+                    <ul class="sub-menu">
+                {volist name="vo['submenu']" id="sub"}
+                        <li>
+                            <a _href="{:url($sub.menu_link)}?menu_name={$sub.menu_name}">
+                                <i class="iconfont">&#xe6a7;</i>
+                                <cite>{$sub.menu_name}</cite>
+                            </a>
+                        </li >
+                {/volist}
+                    </ul>
+                </li>
+                {/volist}
+            </ul>
+        </div>
+    </div>
+    <div class="page-content">
+        <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
+          <ul class="layui-tab-title">
+            <li class="home"><i class="layui-icon">&#xe68e;</i>系统概览</li>
+          </ul>
+          <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <iframe src="{:url('index/welcome')}" frameborder="0" scrolling="yes" class="x-iframe"></iframe>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="page-content-bg"></div>

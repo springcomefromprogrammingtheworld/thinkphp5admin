@@ -1,0 +1,77 @@
+{include file="public/header" /}
+
+<div class="x-body">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <label for="menuname" class="layui-form-label">
+                <span class="x-red"></span>用户名
+            </label>
+            <div class="layui-form-mid layui-word-aux">
+                <span >{$uname}</span>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label for="menuname" class="layui-form-label">
+                <span class="x-red">*</span>新密码
+            </label>
+            <div class="layui-input-inline">
+                <input type="password"   name="npass" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red"></span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="menulink" class="layui-form-label">
+                <span class="x-red">*</span>确认密码
+            </label>
+            <div class="layui-input-inline">
+                <input  type="password"   name="qpass" required="" lay-verify="required"  autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red"></span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="editpass" class="layui-form-label">
+            </label>
+            <button class="layui-btn" lay-filter="editpass" lay-submit="">
+                修改密码
+            </button>
+        </div>
+    </form>
+</div>
+<script>
+    layui.use(['form', 'layer'], function () {
+        $ = layui.jquery;
+        var form = layui.form
+                , layer = layui.layer;
+        //提交
+        form.on('submit(editpass)', function (data) {
+            var udata={
+                npass:data.field.npass,
+                qpass:data.field.qpass
+            };
+            $.ajax({
+                type:"POST",
+                url:'{:url("user/edit_pass")}',
+                data:udata,
+                dataType:'json',
+                success:function(res){
+                    if(res.status==1){
+                        layer.alert(res.msg, {icon: 6,time:3*1000});
+                    }else{
+                        layer.msg(res.msg,{icon:"5",time:3*1000});
+                    }
+                }, error: function (info) {
+                    console.log(info);
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+{include file="public/header" /}
+{include file="public/navtitle" /}
+<div class="x-body">
+    <div class="layui-row">
+    </div>
+    <xblock>
+        <button class="layui-btn" onclick="x_admin_show('添加操作菜单','{:url("menu/add")}')" ><i class="layui-icon"></i>添加后台菜单</button>
+        <span class="x-right" style="line-height:40px">后台共有操作方法：{$action_total}个 </span>
+    </xblock>
+    <table class="layui-table">
+        <thead>
+        <tr>
+            <!--<th>-->
+                <!--<div class="layui-unselect header layui-form-checkbox" lay-skin="primary">-->
+                    <!--<i class="layui-icon">&#xe605;</i>-->
+                <!--</div>-->
+            <!--</th>-->
+            <th>ID</th>
+            <th>权限规则</th>
+            <th>权限名称</th>
+            <th>所属父级菜单</th>
+            <th>可用状态</th>
+            <th>显示状态</th>
+            <th>操作</th>
+        </thead>
+        <tbody>
+        {volist name="list" id="vo"}
+        <tr>
+            <!--<td>-->
+                <!--<div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='2'><i class="layui-icon">&#xe605;</i>-->
+                <!--</div>-->
+            <!--</td>-->
+
+            <td>{$vo.menuid}</td>
+            <td>{$vo.menu_link}</td>
+            <td>{$vo.menu_name}</td>
+            <td>{$vo.ismenu}</td>
+            <td>
+                {eq name="$vo.menu_status" value="1"}
+                <form class="layui-form" action="" style="text-align: center">
+                    {if condition="$vo.parentid==1 OR $vo.menuid==1 "}
+                    <input type='checkbox'  name='mstatus[]'  lay-skin='switch' lay-filter='switchmstatus' lay-text='启用|禁用' data-menuname='{$vo.menu_name}'  data-pid='{$vo.parentid}'  checked value='1' id='{$vo.menuid}' class='menuon'>
+                    {else /}
+                    <input type='checkbox'  name='mstatus[]'  lay-skin='switch' lay-filter='switchmstatus' lay-text='启用|禁用' data-menuname='{$vo.menu_name}'  data-pid='{$vo.parentid}'  checked value='1' id='{$vo.menuid}' class='menuon'>
+                    {/if}
+                </form>
+                {else/}
+                <form class="layui-form" action="" style="text-align: center">
+                    <input type="checkbox"  name="mstatus[]"  lay-skin="switch" lay-filter="switchmstatus" lay-text="启用|禁用" data-menuname="{$vo.menu_name}" data-pid="{$vo.parentid}"   value="0" id="{$vo.menuid}" class="menuon">
+                </form>
+                {/eq}
+            </td>
+
+            <td>
+                {eq name="$vo.menu_display" value="1"}
+                <form class="layui-form" action="" style="text-align: center">
+                    {if condition="$vo.parentid==1 OR $vo.menuid==1 "}
+                    <input type="checkbox"  name="menudisplay[]"  lay-skin="switch" lay-filter="switchdisplay" lay-text="显示|隐藏" data-menuname='{$vo.menu_name}'  data-pid='{$vo.parentid}' checked value="1" id="{$vo.menuid}">
+                    {else /}
+                    <input type="checkbox"  name="menudisplay[]"  lay-skin="switch" lay-filter="switchdisplay" lay-text="显示|隐藏" data-menuname='{$vo.menu_name}'  data-pid='{$vo.parentid}' checked value="1" id="{$vo.menuid}">
+                    {/if}
+                </form>
+                {else/}
+                <form class="layui-form" action="" style="text-align: center">
+                    <input type="checkbox"  name="menudisplay[]"  lay-skin="switch" lay-filter="switchdisplay" lay-text="显示|隐藏" data-menuname='{$vo.menu_name}'  data-pid='{$vo.parentid}'  value="0" id="{$vo.menuid}">
+                </form>
+                {/eq}
+            </td>
+            <td class="td-manage">
+                <a title="编辑操作菜单" onclick="x_admin_show('编辑操作菜单','{:url("menu/edit")}?mid={$vo.menuid}')" href="javascript:;">
+                    <i class="layui-icon">&#xe642;</i>
+                </a>
+                {if condition="$vo.parentid!=0"}
+                <a title="删除" onclick="menu_del(this,'{$vo.menuid}','{$vo.parentid}','{$vo.menu_name}')" href="javascript:;">
+                    <i class="layui-icon">&#xe640;</i>
+                </a>
+                {/if}
+            </td>
+        </tr>
+        {/volist}
+
+        </tbody>
+    </table>
+    <div class="page">
+        <div>
+        {$page}
+        </div>
+    </div>
+
+</div>
+<script>
+    layui.use(['form', 'layer'], function () {
+        var form = layui.form
+                , layer = layui.layer;
+        //监听菜单切换开关
+        form.on('switch(switchmstatus)', function(data){
+            if(this.checked){
+                menu_status_on(this.id,1,layer,this.dataset['menuname'],function(layer,msg){
+                        layer.msg(msg, {
+                            offset: '6px'
+                        });
+                });
+            }else{
+                if(this.id==1||this.dataset['pid']==1){
+                    layer.msg("系统设置及子菜单为后台核心模块不可禁用!", {
+                        offset: '6px'
+                    });
+                    return;
+                }
+                menu_status_on(this.id,0,layer,this.dataset['menuname'],function(layer,msg){
+                    layer.msg(msg, {
+                        offset: '6px'
+                    });
+                });
+            }
+        });
+
+         //监听菜单显示与否开关
+        form.on('switch(switchdisplay)', function(data){
+            if(this.checked){
+                menu_display_on(this.id,1,layer,this.dataset['menuname'],function(layer,msg){
+                    layer.msg(msg, {
+                        offset: '6px'
+                    });
+                });
+            }else{
+                menu_display_on(this.id,0,layer,this.dataset['menuname'],function(layer,msg){
+                    layer.msg(msg, {
+                        offset: '6px'
+                    });
+                });
+            }
+        });
+    });
+
+
+    /**
+     * @param id string 菜单id
+     * @param status_value string 菜单状态值
+     * @param layer ele
+     * @param menuname string 当前菜单名称
+     * @param callback 回调函数
+     * */
+    function menu_status_on(id,status_value,layer,menuname,callback){
+        $.ajax({
+            type:"POST",
+            url:'{:url("menu/menu_status_on")}',
+            data:{
+                mid:id,
+                mstatus:status_value,
+                mname:menuname
+            },
+            dataType:'json',
+            success:function(res){
+               callback(layer,res.msg);
+            }, error: function (info) {
+                console.log(info);
+            }
+        });
+    }
+
+    /**
+     * 显示菜单栏在左边菜单开关
+     * @param id string 菜单id
+     * @param display_value string 菜单状态值
+     * @param layer ele
+     * @param menuname string 当前菜单名称
+     * @param callback 回调函数
+     * */
+    function menu_display_on(id,display_value,layer,menuname,callback){
+        $.ajax({
+            type:"POST",
+            url:'{:url("menu/menu_display_on")}',
+            data:{
+                mid:id,
+                mdisplay:display_value,
+                mname:menuname
+            },
+            dataType:'json',
+            success:function(res){
+                callback(layer,res.msg);
+            }, error: function (info) {
+                console.log(info);
+            }
+        });
+    }
+
+
+
+//    /*用户-停用*/
+//    function member_stop(obj, id) {
+//        layer.confirm('确认要停用吗？', function (index) {
+//
+//            if ($(obj).attr('title') == '启用') {
+//                //发异步把用户状态进行更改
+//                $(obj).attr('title', '停用')
+//                $(obj).find('i').html('&#xe62f;');
+//
+//                $(obj).parents("tr").find(".td-status").find('span').addClass('layui-btn-disabled').html('已停用');
+//                layer.msg('已停用!', {icon: 5, time: 1000});
+//
+//            } else {
+//                $(obj).attr('title', '启用')
+//                $(obj).find('i').html('&#xe601;');
+//
+//                $(obj).parents("tr").find(".td-status").find('span').removeClass('layui-btn-disabled').html('已启用');
+//                layer.msg('已启用!', {icon: 5, time: 1000});
+//            }
+//
+//        });
+//    }
+
+    /**
+     * 菜单-删除
+     * @param obj
+     * @param id 当前菜单id
+     * @param pid 当前菜单所属父id
+     * @param mname 当前菜单名称
+     */
+    function menu_del(obj, id,pid,mname) {
+        layer.confirm('确认要删除'+mname+'操作菜单吗？', function (index) {
+            if(pid==0){
+                layer.msg('顶级菜单不可删除!', {icon: 5, time: 1000});
+                return;
+            }else{
+                //发异步删除数据
+                $.ajax({
+                    type:"POST",
+                    url:'{:url("menu/del")}',
+                    data:{
+                        mid:id,
+                        pid:pid
+                    },
+                    dataType:'json',
+                    success:function(res){
+                        if(res.status==1){
+                            $(obj).parents("tr").remove();
+                            layer.msg('已删除!', {icon: 1, time: 1000});
+                        }else{
+                            layer.msg(res.msg, {icon: 5, time: 1000});
+                        }
+                    }, error: function (info) {
+                        console.log(info);
+                    }
+                });
+            }
+        });
+    }
+
+
+//    function delAll(argument) {
+//        var data = tableCheck.getData();
+//        layer.confirm('确认要删除吗？' + data, function (index) {
+//            //捉到所有被选中的，发异步进行删除
+//            layer.msg('删除成功', {icon: 1});
+//            $(".layui-form-checked").not('.header').parents('tr').remove();
+//        });
+//    }
+</script>
+</body>
+</html>

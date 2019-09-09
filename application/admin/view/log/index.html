@@ -1,0 +1,39 @@
+{include file="public/header" /}
+{include file="public/navtitle" /}
+<div class="x-body">
+    <div class="layui-row">
+    </div>
+    <xblock>
+        <span class="x-right" style="line-height:40px"></span>
+    </xblock>
+    <table class="layui-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>管理员</th>
+            <th>请求URL</th>
+            <th>日志内容</th>
+            <th>客户端ip</th>
+            <th>日志时间</th>
+        </thead>
+        <tbody>
+        {volist name="list" id="vo"}
+        <tr>
+            <td>{$vo.logid}</td>
+            <td>{$vo.login_name}</td>
+            <td>{$vo.req_url}</td>
+            <td>{$vo.log_contents}</td>
+            <td>{$vo.ip}</td>
+            <td>{$vo.log_contents}</td>
+        </tr>
+        {/volist}
+        </tbody>
+    </table>
+    <div class="page">
+        <div>
+            {$page}
+        </div>
+    </div>
+</div>
+</body>
+</html>

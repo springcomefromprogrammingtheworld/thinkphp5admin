@@ -1,0 +1,203 @@
+{include file="public/header" /}
+
+<div class="x-body">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <label for="menuname" class="layui-form-label">
+                <span class="x-red">*</span>菜单名称
+            </label>
+            <div class="layui-input-inline">
+                <input type="hidden" id="menuid" name="menuid"  value="{$emenu.menuid}"/>
+                <input type="text" id="menuname" name="menuname" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input" value="{$emenu.menu_name}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">*例如:系统设置</span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="menulink" class="layui-form-label">
+                <span class="x-red">*</span>链接规则
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="menulink" name="menulink"  value="{$emenu.menu_link}"
+                       autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">*例如:user/index</span>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label for="menulink" class="layui-form-label">
+                <span class="x-red">*</span>菜单分类
+            </label>
+            <div class="layui-input-block" style="width: 50%">
+                <select name="menulevel" lay-verify="required">
+                    <option value="0">顶级菜单</option>
+                    {volist name="topmenu" id="vo"}
+                    {if condition="$vo.menuid==$emenu.parentid"}
+                    <option value="{$vo.menuid}" selected>{$vo.menu_name}</option>
+                    {else /}
+                    <option value="{$vo.menuid}">{$vo.menu_name}</option>
+                    {/if}
+                    {/volist}
+                </select>
+            </div>
+
+        </div>
+
+        <div class="layui-form-item">
+            <label for="menulink" class="layui-form-label">
+                <span class="x-red">*</span>排序
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="menusort" name="menusort" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input"  value="{$emenu.menu_sort}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">*例如:99</span>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label for="menulink" class="layui-form-label">
+                <span class="x-red"></span>菜单状态
+            </label>
+            <div class="layui-input-inline" style="padding-top: 6px;">
+                {if condition="$emenu.menu_status==1"}
+                <input type="checkbox" name="mstatus" id="mstatus" lay-skin="switch" lay-filter="menuswitch" lay-text="启用|禁用" checked value="1" >
+                {else /}
+                <input type="checkbox" name="mstatus" id="mstatus" lay-skin="switch" lay-filter="menuswitch" lay-text="启用|禁用" value="0" >
+                {/if}
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+            </div>
+        </div>
+
+        <!--<div class="layui-form-item">-->
+        <!--<label for="menulink" class="layui-form-label">-->
+        <!--<span class="x-red"></span>菜单图标-->
+        <!--</label>-->
+        <!--<div class="layui-input-inline">-->
+        <!--<input type="text" id="menuicon" name="menuicon" autocomplete="off" class="layui-input">-->
+        <!--</div>-->
+        <!--<div class="layui-form-mid layui-word-aux">-->
+        <!--<span class="x-red" style="color: #000">可选(左边菜单图标有限路径配置,一般显示在左边菜单栏的操作可配置)</span>-->
+        <!--</div>-->
+        <!--</div>-->
+
+        <div class="layui-form-item">
+            <label for="menulink" class="layui-form-label">
+                <span class="x-red"></span>显示状态
+            </label>
+            <div class="layui-input-inline" style="padding-top: 6px;">
+                {if condition="$emenu.menu_display==1"}
+                <input type="checkbox" name="mdisplay" id="mdisplay" lay-skin="switch" lay-filter="mdisplayswitch" lay-text="显示|隐藏" checked value="{$emenu.menu_display}"  >
+                {else /}
+                <input type="checkbox" name="mdisplay" id="mdisplay" lay-skin="switch" lay-filter="mdisplayswitch" lay-text="显示|隐藏" value="{$emenu.menu_display}"  >
+                {/if}
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">由于后台每个操作都需要权限验证，所以有些不显示在左边菜单栏的操作应该设置隐藏!</span>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label for="menulink" class="layui-form-label">
+                <span class="x-red"></span>备注
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="remarks" name="remarks" autocomplete="off" class="layui-input" value="{$emenu.remarks}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red"></span>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label for="edit" class="layui-form-label">
+            </label>
+            <button class="layui-btn" lay-filter="edit" lay-submit="">
+                修改
+            </button>
+        </div>
+    </form>
+</div>
+<script>
+    layui.use(['form', 'layer'], function () {
+        $ = layui.jquery;
+        var form = layui.form
+                , layer = layui.layer;
+        //修改
+        form.on('submit(edit)', function (data) {
+            var udata={
+                menuid:data.field.menuid,
+                mstatus:$("#mstatus").val(),
+                mdisplay:$("#mdisplay").val(),
+                menuname:data.field.menuname,
+                menulink:data.field.menulink,
+                menulevel:data.field.menulevel,
+                menusort:data.field.menusort,
+                remarks:data.field.remarks
+            };
+            $.ajax({
+                type:"POST",
+                url:'{:url("menu/edit")}',
+                data:udata,
+                dataType:'json',
+                success:function(res){
+                    if(res.status==1){
+                        layer.alert(res.msg, {icon: 6}, function () {
+                            // 获得frame索引
+                            var index = parent.layer.getFrameIndex(window.name);
+                            //关闭当前frame
+                            parent.layer.close(index);
+                        });
+
+                    }else{
+                        layer.msg(res.msg,{icon:"5",time:3*1000});
+                    }
+                }, error: function (info) {
+                    console.log(info);
+                }
+            });
+            return false;
+        });
+
+
+
+        //监听菜单切换开关
+        form.on('switch(menuswitch)', function(data){
+            if(this.checked){
+                $("#mstatus").val(1);
+                layer.msg('启用当前菜单', {
+                    offset: '6px'
+                });
+            }else{
+                $("#mstatus").val(0);
+                layer.msg('禁用当前菜单', {
+                    offset: '6px'
+                });
+            }
+        });
+
+        //监听菜单切换开关
+        form.on('switch(mdisplayswitch)', function(data){
+            if(this.checked){
+                $("#mdisplay").val(1);
+                layer.msg('显示当前菜单操作在左边菜单栏', {
+                    offset: '6px'
+                });
+            }else{
+                $("#mdisplay").val(0);
+                layer.msg('隐藏当前菜单操作', {
+                    offset: '6px'
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>
